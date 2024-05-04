@@ -1,0 +1,27 @@
+= About
+
+This file will document my build process of the Aurora Lily48 split keyboard
+
+TODO: Document content (board, switches, etc.)
+
+= Day 1 - May 4h (be with you) 2024
+
+13h40: Unpacking everything !
+
+14h08: After some doc reading (again !), we start with diodes
+In my case I *have* to solder diodes from the bottom side to ensure the top side will have as few protruding tin as possible.
+
+Using jewel tweezers is helpful for bending diode legs !
+
+Better do them 10-15 at a time to be efficient
+
+15h: done bending and installing diodes ! phew !
+
+Since I Have to solder on the bottom side (on the diode side) to avoid tin on the top side (which would hinder plate placement),
+it's better to have every diode placed so that the plate is "hovering" when soldering
+
+15h15 début soudure diodes
+15h26: fin première plaque
+15h35: fin soudures diodes !
+15h56: cleanup and done !
+
