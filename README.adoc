@@ -2,7 +2,7 @@
 
 This file will document my build process of the Aurora Lily48 split keyboard
 
-TODO: Document content (board, switches, etc.)
+TODO: Document the Bill of Materials (board, switches, etc.)
 
 = Day 1 - May 4h (be with you) 2024
 
@@ -17,11 +17,98 @@ Better do them 10-15 at a time to be efficient
 
 15h: done bending and installing diodes ! phew !
 
-Since I Have to solder on the bottom side (on the diode side) to avoid tin on the top side (which would hinder plate placement),
-it's better to have every diode placed so that the plate is "hovering" when soldering
+Since I have to solder on the bottom side (on the diode side) to avoid tin on the top side (which would hinder plate placement), it's better to have every diode placed so that the plate is "hovering" when soldering: bent diodes legs a bit so that all the legs act as a base to help me solder diode on the diode side.
 
-15h15 début soudure diodes
-15h26: fin première plaque
-15h35: fin soudures diodes !
-15h56: cleanup and done !
+Note from the future: this was a very valuable advice but I still needed to use a Dremel to file the remaining cut leg parts.
 
+= Day 2 - May 6th
+
+Well not yet, first I have to install Vial of QMK
+Vial is a GUI se should be nice for a begineer ? Well, keyboard is not recognized so...QMK it is
+
+QMK install is straightforward (python sucks, though) so next is its setup
+From my understanding, it clones a standards Git repo locally, okayyyyy ?
+Even better, it seems it's better to fork the standard repo (https://github.com/qmk/qmk_firmware) into your own (hence https://github.com/StephaneTrebel/qmk_firmware) and `qmk setup` will handle it from here
+
+Flash is done with default uf2 files
+Now on to soldering ! But not today !
+
+= Day 3 - May 7th
+
+Now to solder the microcontrollers !
+
+Souder tout d'un coup (après les 4 coins) permet d'aller vite et surtout de choper le coup de main pour Souder
+It can be a bit overwhelming but soldering can be kinda quick when the iron is already hot, so better to "get it over with" instead of overthinking every soldering act. And you avoid putting too much solder which is an issue in itself, too.
+
+Note: WASHITAPE IS LOVE, WASHITAPE SI LIFE !!! For keeping stuff in place it's ideal !
+
+And then the realization: I soldered a microcontroller upside-down 😱
+Well, ok, let's finish the rest before falling into despair…
+
+= Day 4 - May 8th
+
+Dremel + assembly test with switches
+
+= Day 5 - May 9th
+
+Back in business ! It's switch soldering time !
+
+I was kinda apprehensive on this because there are 58 switches, 2 leg per switch, and I was relying on my Dremel work to have a nice and protruding switch leg on the other side. Thankfully, solder can easily fill up around the protruding leg so that it can ensure enough contact with the PCB. Nice !
+
+= The big pause (until June 15th)
+
+I was kinda bummed out after my blunder…soldering one controller upside down meant that I had to either repair the controller (desoldering 24! legs and try to resolder them again properly), or buy a new one. I ended up buying a new one (hence the delay and the big pause: logistics delivery and my vacation time was over and I was back to work), because it's my first attempt at this endeavour and I wanted to avoid using damaged parts as much as possible, but it really left a sour taste in my mouth.
+
+Soldering the new controller was pretty fast (and kinda clean might I add !), but there was still something off: the controller was very "jiggly". After carefully reading the docs (again!) I realized that I had to push REALLY hard on the pins for them to properly slide in the controller socket. After doing just that…and plugging everything in…it worked !
+
+= On to flashing !
+
+I initially thought that the hardware part was going to be complicated, but that the software part would be a piece of cake.
+WELL ACKTCHUALLY… 😅
+
+I tried the two aforementioned approaches :
+
+== Vial
+
+Vial is a nice piece of software, but for some reason I could not make it update my keyboard layout. Now that I'm writing this after succeeding in flashing with QMK, I think I should give Vial a second chance. But as an advice: take the time to read the QMK documentation and succeed at least one in flashing with it before going back to Vial for ergronomics purposes, you will benefit from this.
+
+== QMK
+
+Now that's a beast…after carefully setup QMK (which is a thing in itself), I went on to configuring a layout with https://config.qmk.fm[QMK web app]. My real mistake here was thinking that compiling a firmware with the web app was going to work, or at least tell me if there was going to be an error during flashing. Nothing of the sort happened (and you'll soon understand why).
+
+But at least I got a keymap.json file that was QMK compliant. I setup a BÉPO layout that was close to what I was used to with my Typematrix and was ready to rock on with QMK.
+
+After tinkering for A DAY 😫 I was not able to update the default QWERTY layout: Flashing was logged as done and ok at every step of the way, but nothing actually changed when I pressed my keys. But after A LOT of searching (curse Discord for not appearing in search engine results btw), I tried to change the default QMK compile/flash command to:
+
+[source, bash]
+----
+qmk flash -e CONVERT_TO=liatris -kb splitkb/aurora/lily58/rev1 -km stephanetrebel
+----
+
+The crucial part being `CONVERT_TO=liatris`.
+
+And then, it worked !!! It seems that this was needed for the final uf2 file to be correctly parsed by the controller.
+PFEW! That was a relief ! :D
+
+Next stop is…understanding keycodes, layouts, and why a BÉPO layout baked in the keyboard was a mistake of epic proportions ¡¡
+
+== Keycodes, Layouts, and you
+
+Since I did not know a single thing on this topic, I naively thought that having my BÉPO layout baked in my keyboard would be the best idea, but alas it's not that simple:
+
+- The only "real" layouts are ANSI or ISO QWERTY hardware layout (I leave out JIS as an outlier, forgive me Japan !)
+- OS layouts actually "cheat" by saying a given keycode is doing something else than what its original layout says.
+
+For instance, in AZERTY, when your keyboard sends a 'Q' keycode, it's automatically transcribed as an 'A' by the OS, through the AZERTY layout table. So, for BÉPO, I can't setup my keyboard to send a 'é', 'ç', or 'à' keycode simply because THESE KEYCODES DO NOT EXIST in ANSI/ISO layout.
+
+And by testing my BÉPO Typematrix I quickly realized that it actually was setup in QWERTY and that it was the BÉPO layout in the OS that was doing the heavy lifting. In hindsight it seems obvious but when you're deep down the rabbit hole… 🐰
+
+Anyway, back to QWERTY layout for my keyboard, with some adjustments here and there (mostly because I now have waaaaay less keys than before :D) and on to the last task: rewiring all my muscle memory with my new hard-earned Lily58 keyboard 💗
+
+= Parting words
+
+It was an adventure that spanned a little more than a month, but if I was doing it again now it would be waaaaay faster, maybe 5-6 hours tops, instead of idk 12-15 hours for this first iteration.
+
+But I don't regret it one second, because not only did I learned a lot, I also had a lot of fun soldering (and remember thatit was dreadful to me in the beginning). Seeing that I have been able to craft an electronic device (and a kinda precision based one like a keyboard !) felt really empowering. And I already feel the urge to do another one ! Maybe I'll tackle the OLED RGB diodes next time ? We'll see ;)
+
+Thanks for reading and see you soon !
